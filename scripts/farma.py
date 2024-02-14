@@ -1,4 +1,5 @@
 import requests
+import pandas as pd
 
 def obtener_datos(url):
     try:
@@ -14,24 +15,20 @@ def organizar_datos(farmacias):
         print("No hay datos para organizar.")
         return
 
-    organizado_por_comuna = {}
-    for farmacia in farmacias:
-        comuna = farmacia['comuna_nombre']
-        if comuna not in organizado_por_comuna:
-            organizado_por_comuna[comuna] = []
-        organizado_por_comuna[comuna].append(farmacia)
+    # Convertimos la lista de farmacias a un DataFrame de Pandas
+    df = pd.DataFrame(farmacias)
     
-    for comuna, farmacias in organizado_por_comuna.items():
-        print(f"Comuna: {comuna}")
-        for farmacia in farmacias:
-            print(f"  Nombre: {farmacia['local_nombre']}")
-            print(f"  Dirección: {farmacia['local_direccion']}")
-            print(f"  Teléfono: {farmacia['local_telefono']}")
-            print(f"  Horario: {farmacia['funcionamiento_hora_apertura']} - {farmacia['funcionamiento_hora_cierre']}")
-            print(f"  Latitud: {farmacia['local_lat']}, Longitud: {farmacia['local_lng']}")
-            print("  ---")
-        print("---------\n")
+    # Si necesitas reordenar o seleccionar columnas específicas, puedes hacerlo así:
+    # df = df[['comuna_nombre', 'local_nombre', 'local_direccion', 'local_telefono', 'funcionamiento_hora_apertura', 'funcionamiento_hora_cierre', 'local_lat', 'local_lng']]
+    
+    return df
 
 url = "https://midas.minsal.cl/farmacia_v2/WS/getLocales.php"
 datos = obtener_datos(url)
-organizar_datos(datos)
+df_farmacias = organizar_datos(datos)
+
+if df_farmacias is not None:
+    # Muestra las primeras filas del DataFrame para verificar los datos
+    print(df_farmacias.head())
+else:
+    print("No se pudo crear el DataFrame.")
