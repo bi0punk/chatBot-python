@@ -550,6 +550,7 @@ py-altdns==1.0.2
 py-sneakers==1.0.1
 py-ubjson==0.16.1
 pyaes==1.6.1
+pyarrow==15.0.0
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
 pybase62==1.0.0
