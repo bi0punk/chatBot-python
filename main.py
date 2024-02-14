@@ -157,6 +157,9 @@ pairs = [
     
     (r'Cuéntame algo interesante',
      ['¿Sabías que los pulpos tienen tres corazones? Dos bombean sangre a las branquias, mientras que el tercero la bombea al resto del cuerpo.']),
+     
+    (r'último sismo en Chile|último terremoto en Chile',
+     [lambda match: obtener_ultimo_sismo_chile()]),
 ]
 
 
@@ -165,6 +168,11 @@ chatbot = Chat(pairs, reflections)
 def iniciar_chat():
     print("Hola, soy tu asistente. Escribe 'quit' para salir.")
     chatbot.converse()
+
+def obtener_ultimo_sismo_chile():
+    return "El último sismo en Chile fue de magnitud 5.4, cerca de Santiago, el 12 de febrero de 2024."
+
+
 
 if __name__ == "__main__":
     iniciar_chat()
