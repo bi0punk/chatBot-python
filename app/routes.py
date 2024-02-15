@@ -1,5 +1,5 @@
 from flask import current_app as app, render_template, request, jsonify
-from chatbot.bot import respond  
+from chatbot.bot import obtener_respuesta  # Modificamos aquí
 
 @app.route('/')
 def home():
@@ -7,6 +7,7 @@ def home():
 
 @app.route('/ask', methods=['POST'])
 def ask():
-    message = request.form['messageText'].strip() 
-    response = respond(message)  
-    return jsonify({'message': response})  
+    data = request.get_json()
+    mensaje = data['messageText']
+    respuesta = obtener_respuesta(mensaje)  # Usa tu función de NLTK aquí
+    return jsonify({'message': respuesta})

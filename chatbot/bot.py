@@ -165,9 +165,13 @@ pairs = [
 
 chatbot = Chat(pairs, reflections)
 
-def iniciar_chat():
-    print("Hola, soy tu asistente. Escribe 'quit' para salir.")
-    chatbot.converse()
+def obtener_respuesta(mensaje):
+    # Devuelve la respuesta del chatbot al mensaje proporcionado
+    respuesta = chatbot.respond(mensaje)
+    if respuesta is None:
+        # Proporciona una respuesta predeterminada si el chatbot no tiene una respuesta
+        respuesta = "Lo siento, no entiendo tu pregunta."
+    return respuesta
 
 def obtener_ultimo_sismo_chile():
     return "El último sismo en Chile fue de magnitud 5.4, cerca de Santiago, el 12 de febrero de 2024."
@@ -175,4 +179,4 @@ def obtener_ultimo_sismo_chile():
 
 
 if __name__ == "__main__":
-    iniciar_chat()
+    obtener_respuesta()
