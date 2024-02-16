@@ -30,7 +30,6 @@
         <div class="row">
             <div class="col-md-6 offset-md-3">
                 <div id="areaDeMensajes">
-                    <!-- Los mensajes aparecerán aquí -->
                 </div>
                 <div class="input-group mb-3">
                     <input type="text" id="textoMensaje" class="form-control" placeholder="Escribe tu mensaje aquí..." aria-label="Escribe tu mensaje aquí...">
@@ -45,10 +44,8 @@
         document.getElementById("botonEnviar").addEventListener("click", function() {
             var mensaje = document.getElementById("textoMensaje").value.trim();
             if (mensaje !== "") {
-                // Añade el mensaje al área de mensajes como un mensaje propio
                 agregarMensajeAlChat(mensaje, "mensaje-propio");
         
-                // Enviar el mensaje al servidor mediante AJAX
                 fetch('/ask', {
                     method: 'POST',
                     headers: {
@@ -64,7 +61,6 @@
                     console.error('Error:', error);
                 });
         
-                // Limpia el campo de entrada
                 document.getElementById("textoMensaje").value = "";
             }
         });
@@ -74,8 +70,7 @@
             div.classList.add("mensaje", clase);
             div.textContent = mensaje;
             document.getElementById("areaDeMensajes").appendChild(div);
-        
-            // Desplaza el área de mensajes al último mensaje
+    
             document.getElementById("areaDeMensajes").scrollTop = document.getElementById("areaDeMensajes").scrollHeight;
         }
         </script>

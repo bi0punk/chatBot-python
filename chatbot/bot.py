@@ -165,13 +165,33 @@ pairs = [
 
 chatbot = Chat(pairs, reflections)
 
+import re
+
+def evaluar_expresion_matematica(expresion):
+    # Asegurarse de que la expresión solo contenga números y operadores matemáticos básicos
+    if re.match(r"^\d+(\.\d+)?([+\-*/]\d+(\.\d+)?)*$", expresion):
+        try:
+            # Evaluar la expresión matemática
+            resultado = eval(expresion)
+            return str(resultado)
+        except Exception as e:
+            return f"Error al evaluar la expresión: {e}"
+    else:
+        return None
+
 def obtener_respuesta(mensaje):
-    # Devuelve la respuesta del chatbot al mensaje proporcionado
-    respuesta = chatbot.respond(mensaje)
-    if respuesta is None:
-        # Proporciona una respuesta predeterminada si el chatbot no tiene una respuesta
-        respuesta = "Lo siento, no entiendo tu pregunta."
-    return respuesta
+    # Intenta resolver el mensaje como una operación matemática
+    resultado_matematico = evaluar_expresion_matematica(mensaje)
+    if resultado_matematico is not None:
+        # Si el mensaje es una operación matemática, devuelve el resultado
+        return resultado_matematico
+    else:
+        # Si no, procesa el mensaje con el chatbot
+        respuesta = chatbot.respond(mensaje)
+        if respuesta is None:
+            # Proporciona una respuesta predeterminada si el chatbot no tiene una respuesta
+            respuesta = "Lo siento, no entiendo tu pregunta."
+        return respuesta
 
 def obtener_ultimo_sismo_chile():
     return "El último sismo en Chile fue de magnitud 5.4, cerca de Santiago, el 12 de febrero de 2024."
