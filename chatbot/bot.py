@@ -166,18 +166,45 @@ pairs = [
 chatbot = Chat(pairs, reflections)
 
 import re
+import ast
+import operator
 
 def evaluar_expresion_matematica(expresion):
-    # Asegurarse de que la expresión solo contenga números y operadores matemáticos básicos
     if re.match(r"^\d+(\.\d+)?([+\-*/]\d+(\.\d+)?)*$", expresion):
         try:
-            # Evaluar la expresión matemática
-            resultado = eval(expresion)
+            tree = ast.parse(expresion, mode='eval')
+            resultado = safe_eval_ast(tree.body)
             return str(resultado)
+        except ZeroDivisionError:
+            return "Error: División por cero"
         except Exception as e:
             return f"Error al evaluar la expresión: {e}"
     else:
         return None
+
+def safe_eval_ast(node):
+    allowed_ops = {
+        ast.Add: operator.add, ast.Sub: operator.sub,
+        ast.Mult: operator.mul, ast.Div: operator.truediv,
+        ast.USub: operator.neg, ast.UAdd: operator.pos,
+    }
+    if isinstance(node, ast.Expression):
+        return safe_eval_ast(node.body)
+    if isinstance(node, ast.Constant):
+        if isinstance(node.value, (int, float)):
+            return node.value
+        raise ValueError("Tipo no soportado")
+    if isinstance(node, ast.BinOp):
+        op_func = allowed_ops.get(type(node.op))
+        if not op_func:
+            raise ValueError("Operación no soportada")
+        return op_func(safe_eval_ast(node.left), safe_eval_ast(node.right))
+    if isinstance(node, ast.UnaryOp):
+        op_func = allowed_ops.get(type(node.op))
+        if not op_func:
+            raise ValueError("Operación no soportada")
+        return op_func(safe_eval_ast(node.operand))
+    raise ValueError("Expresión no válida")
 
 def obtener_respuesta(mensaje):
     # Intenta resolver el mensaje como una operación matemática
