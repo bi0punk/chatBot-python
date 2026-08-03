@@ -57,12 +57,10 @@ chatBot-python/
 │   ├── __init__.py
 │   ├── bot.py                # Lógica NLTK + evaluador matemático
 │   └── scripts/              # Scripts auxiliares
-│       ├── farma2.py
-│       └── farmacia.py
+│       ├── __init__.py
+│       └── farmacia.py       # Consulta farmacias de turno (MINSAL)
 └── tests/
     ├── __init__.py
-    ├── test_bot.py
-    ├── test_routes.py
     └── test_smoke.py
 ```
 
@@ -110,12 +108,14 @@ pytest -q
 
 ## Configuración
 
-No requiere variables de entorno. Ver `.env.example`:
+Variables de entorno (ver `.env.example`):
 
-```
-# Environment variables
-# Add your configuration here
-```
+| Variable | Default | Descripción |
+|---|---|---|
+| `SECRET_KEY` | (generada) | Clave secreta de Flask para sesiones |
+| `FLASK_DEBUG` | `0` | Modo debug (`1` para desarrollo) |
+
+Rate limiting: 30 peticiones/minuto por IP en el endpoint `/ask`. Entrada máxima: 500 caracteres.
 
 ## CI
 
