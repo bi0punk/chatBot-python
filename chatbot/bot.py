@@ -1,8 +1,24 @@
-from nltk.chat.util import Chat, reflections
+import ast
+import operator
+import re
 
+from nltk.chat.util import Chat
+
+ES_REFLECTIONS = {
+    "yo": "tú",
+    "me": "te",
+    "mi": "tu",
+    "mis": "tus",
+    "soy": "eres",
+    "estoy": "estás",
+    "tengo": "tienes",
+    "voy": "vas",
+    "puedo": "puedes",
+    "sé": "sabes",
+}
 
 pairs = [
-    (r'Hola|Hola|Hey', 
+    (r'Hola|Hey|Hola', 
      ['Hola, ¿Cómo puedo ayudarte?', '¡Hola! ¿En qué puedo asistirte?', '¡Hola! ¿Cómo estás?']),
     
     (r'¿Cómo estás\??',
@@ -163,11 +179,7 @@ pairs = [
 ]
 
 
-chatbot = Chat(pairs, reflections)
-
-import re
-import ast
-import operator
+chatbot = Chat(pairs, ES_REFLECTIONS)
 
 def evaluar_expresion_matematica(expresion):
     if re.match(r"^\d+(\.\d+)?([+\-*/]\d+(\.\d+)?)*$", expresion):
@@ -226,4 +238,10 @@ def obtener_ultimo_sismo_chile():
 
 
 if __name__ == "__main__":
-    obtener_respuesta()
+    print("ChatBot (escribe 'salir' para terminar)")
+    while True:
+        msg = input("> ").strip()
+        if msg.lower() in ("salir", "exit", "quit"):
+            break
+        print(obtener_respuesta(msg))
+
