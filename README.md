@@ -1,77 +1,94 @@
 # chatBot-python
 
-> Chatbot conversacional en español construido con Flask y NLTK. Responde preguntas, realiza operaciones matemáticas y mantiene diálogos básicos.
+Chatbot conversacional en español construido con Flask y NLTK. Responde preguntas, realiza operaciones matemáticas y mantiene diálogos básicos vía interfaz web y API REST.
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue)](https://python.org)
+[![Flask](https://img.shields.io/badge/Flask-3.0-000000?logo=flask)](https://flask.palletsprojects.com/)
+[![CI](https://github.com/bi0punk/chatBot-python/actions/workflows/ci.yml/badge.svg)](https://github.com/bi0punk/chatBot-python/actions/workflows/ci.yml)
 
-## Tabla de Contenidos
+## Contenido
 
 - [Características](#características)
-- [Stack](#stack)
 - [Arquitectura](#arquitectura)
+- [Stack](#stack)
+- [Estructura del repositorio](#estructura-del-repositorio)
 - [Requisitos](#requisitos)
 - [Instalación](#instalación)
 - [Uso](#uso)
-- [Tests](#tests)
 - [Configuración](#configuración)
-- [CI](#ci)
-- [Limitaciones / Roadmap](#limitaciones--roadmap)
+- [Tests / CI](#tests--ci)
+- [Roadmap](#roadmap)
 - [Licencia](#licencia)
 
 ## Características
 
-- Diálogos basados en patrones regex con NLTK (`nltk.chat.util.Chat`)
-- Evaluación de expresiones matemáticas (AST seguro) desde el mensaje
-- Interfaz web con Bootstrap 5 y consumo vía API REST (POST `/ask`)
-- Más de 40 pares de preguntas/respuestas predefinidas en español
-- Evaluador matemático con operaciones básicas (+, -, *, /)
-- Código modular: separación clara entre lógica del bot y configuración Flask
+- Diálogos basados en patrones regex con NLTK (`nltk.chat.util.Chat`).
+- Evaluación de expresiones matemáticas (AST seguro) desde el mensaje.
+- Interfaz web con Bootstrap 5 y consumo vía API REST (POST `/ask`).
+- Más de 40 pares de preguntas/respuestas predefinidas en español.
+- Evaluador matemático con operaciones básicas (+, -, *, /).
+- Rate limiting (30 peticiones/min por IP) y longitud máxima de entrada (500 caracteres).
+- Script auxiliar de farmacias de turno (consulta MINSAL de Chile) en `chatbot/scripts/`.
+- Código modular: separación clara entre lógica del bot y aplicación Flask.
+
+## Arquitectura
+
+```mermaid
+flowchart TD
+  U[Usuario] --> W[Web Bootstrap index.html]
+  W --> R[POST /ask app/routes.py]
+  R --> RL{Rate limit 30 req/min}
+  RL -- excede --> BUSY[429/Error]
+  RL -- ok --> BOT[chatbot/bot.py]
+  BOT --> N[NLTK patterns + reflections]
+  BOT --> EVAL[Evaluador matematico con AST seguro]
+  BOT --> AUX[scripts auxiliares: farmacias MINSAL]
+  EVAL --> RESP[JSON respuesta]
+  N --> RESP
+  AUX --> RESP
+```
 
 ## Stack
 
 - **Python 3.11+**
-- **Flask** — servidor web y API REST
-- **NLTK** — procesamiento de lenguaje natural (pattern matching)
-- **pandas** — utilidades auxiliares
-- **Bootstrap 5** — frontend
+- **Flask 3.0** — servidor web y API REST.
+- **NLTK** — procesamiento de lenguaje natural (pattern matching).
+- **pandas / numpy** — utilidades auxiliares (dataframes en scripts).
+- **requests** — consultas HTTP externas.
+- **Bootstrap 5** — frontend.
 
-## Arquitectura
+## Estructura del repositorio
 
 ```
 chatBot-python/
-├── .env.example
-├── .github/workflows/ci.yml
-├── .gitignore
-├── LICENSE
-├── README.md
-├── pyproject.toml
-├── requirements.txt
-├── run.py                    # Entrypoint Flask
+├── run.py                    # Entrypoint Flask (crea la app)
 ├── app/
 │   ├── __init__.py           # Factory create_app()
-│   ├── routes.py             # Rutas: / (GET) y /ask (POST)
+│   ├── routes.py             # Rutas: / (GET) y /ask (POST) con rate limit
 │   └── templates/
 │       └── index.html        # UI del chatbot
 ├── chatbot/
 │   ├── __init__.py
 │   ├── bot.py                # Lógica NLTK + evaluador matemático
-│   └── scripts/              # Scripts auxiliares
-│       ├── __init__.py
+│   └── scripts/
 │       └── farmacia.py       # Consulta farmacias de turno (MINSAL)
-└── tests/
-    ├── __init__.py
-    └── test_smoke.py
+├── tests/
+│   └── test_smoke.py
+├── .env.example
+├── .github/workflows/ci.yml
+├── requirements.txt
+└── pyproject.toml
 ```
 
 ## Requisitos
 
-- Python 3.11 o superior
+- Python 3.11+.
 
 ## Instalación
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/bi0punk/chatBot-python.git
 cd chatBot-python
 pip install -r requirements.txt
 ```
@@ -99,37 +116,31 @@ curl -X POST http://localhost:5000/ask \
 # {"message":"4"}
 ```
 
-## Tests
+## Configuración
+
+| Variable | Default | Descripción |
+|---|---|---|
+| `SECRET_KEY` | — | Clave secreta de Flask para sesiones. |
+| `FLASK_DEBUG` | `0` | Modo debug (`1` para desarrollo). |
+
+Rate limiting: 30 peticiones/minuto por IP en el endpoint `/ask`. Entrada máxima: 500 caracteres.
+
+## Tests / CI
 
 ```bash
 pip install pytest ruff
 pytest -q
 ```
 
-## Configuración
+GitHub Actions (`.github/workflows/ci.yml`) sobre Python 3.11: `ruff check` + `pytest`.
 
-Variables de entorno (ver `.env.example`):
+## Roadmap
 
-| Variable | Default | Descripción |
-|---|---|---|
-| `SECRET_KEY` | (generada) | Clave secreta de Flask para sesiones |
-| `FLASK_DEBUG` | `0` | Modo debug (`1` para desarrollo) |
-
-Rate limiting: 30 peticiones/minuto por IP en el endpoint `/ask`. Entrada máxima: 500 caracteres.
-
-## CI
-
-GitHub Actions — Push/PR:
-
-- `ruff check`
-- `pytest`
-
-## Limitaciones / Roadmap
-
-- Diálogos basados en regex (sin NLP profundo ni modelos de lenguaje)
-- Sin persistencia de conversaciones
-- Sin soporte para contexto o memoria entre mensajes
-- A futuro: integración con APIs externas, modelo ML, logging de conversaciones
+- [x] Diálogos NLTK + evaluador matemático seguro
+- [x] API REST y web UI
+- [ ] Integración con APIs externas
+- [ ] Modelo ML para conversación
+- [ ] Logging de conversaciones
 
 ## Licencia
 
