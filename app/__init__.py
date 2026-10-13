@@ -1,6 +1,7 @@
 import logging
 import os
 import secrets
+
 from flask import Flask
 
 logging.basicConfig(
@@ -9,12 +10,12 @@ logging.basicConfig(
 )
 log = logging.getLogger("chatbot")
 
+
 def create_app():
     app = Flask(__name__)
     app.secret_key = os.environ.get("SECRET_KEY", secrets.token_hex(32))
 
     with app.app_context():
-        from . import routes
+        from . import routes  # noqa: F401  (registro de rutas como efecto lateral)
 
     return app
-

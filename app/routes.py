@@ -1,6 +1,8 @@
 import logging
 import time
-from flask import current_app as app, jsonify, render_template, request
+
+from flask import current_app as app
+from flask import jsonify, render_template, request
 
 from chatbot.bot import obtener_respuesta
 

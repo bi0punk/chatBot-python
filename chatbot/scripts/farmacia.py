@@ -42,6 +42,7 @@ def imprimir_por_comuna(organizado):
 
 def a_dataframe(farmacias):
     import pandas as pd
+
     df = pd.DataFrame(farmacias)
     df = df.rename(
         columns={
